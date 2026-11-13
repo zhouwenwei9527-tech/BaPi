@@ -1,0 +1,14 @@
+target/
+node_modules/
+dist/
+data/
+backup/
+logs/
+.git/
+.idea/
+*.iml
+.DS_Store
+playwright-report/
+test-results/
+screenshots/
+docs/screenshots/

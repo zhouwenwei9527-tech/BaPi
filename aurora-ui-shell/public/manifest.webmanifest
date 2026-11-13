@@ -1,0 +1,13 @@
+{
+  "name": "BaPi · Aurora",
+  "short_name": "BaPi",
+  "description": "macOS 范式的 AI 原生后台管理框架",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070d1a",
+  "theme_color": "#070d1a",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "128x104", "type": "image/png", "purpose": "any" },
+    { "src": "/bapi-logo.png", "sizes": "512x418", "type": "image/png", "purpose": "any" }
+  ]
+}

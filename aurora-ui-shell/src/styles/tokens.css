@@ -1,0 +1,167 @@
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  --blur: 30px;
+  --saturation: 185%;
+  --glass-opacity: 0.52;
+  --glass-rgb: 22, 27, 43;
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-specular: rgba(255, 255, 255, 0.28);
+  --glass-highlight: rgba(255, 255, 255, 0.07);
+
+  --text: #f4f7ff;
+  --text-soft: rgba(244, 247, 255, 0.78);
+  --muted: rgba(233, 239, 255, 0.6);
+  --faint: rgba(233, 239, 255, 0.36);
+  --row: rgba(255, 255, 255, 0.065);
+  --row-hover: rgba(255, 255, 255, 0.11);
+  --row-active: rgba(255, 255, 255, 0.16);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-soft: rgba(255, 255, 255, 0.07);
+
+  --accent: #5aa7ff;
+  --accent-strong: #2f7cf6;
+  --accent-soft: rgba(90, 167, 255, 0.18);
+  --violet: #a78bfa;
+  --ok: #3ddc97;
+  --ok-soft: rgba(61, 220, 151, 0.16);
+  --warn: #ffbd5c;
+  --warn-soft: rgba(255, 189, 92, 0.16);
+  --bad: #ff7a70;
+  --bad-soft: rgba(255, 122, 112, 0.16);
+
+  --shadow-window: 0 40px 120px rgba(0, 0, 0, 0.62), 0 8px 30px rgba(0, 0, 0, 0.34);
+  --shadow-dock: 0 22px 60px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 26px 70px rgba(0, 0, 0, 0.5);
+
+  --radius-window: 16px;
+  --radius-panel: 18px;
+  --radius-card: 14px;
+  --radius-control: 9px;
+
+  --wallpaper:
+    radial-gradient(70% 60% at 12% 6%, rgba(20, 184, 166, 0.34), transparent 66%),
+    radial-gradient(58% 62% at 88% 12%, rgba(139, 92, 246, 0.34), transparent 68%),
+    radial-gradient(80% 62% at 56% 104%, rgba(37, 99, 235, 0.5), transparent 70%),
+    linear-gradient(165deg, #060a15 0%, #0b1730 52%, #07202d 100%);
+  --wallpaper-soft:
+    radial-gradient(60% 50% at 20% 10%, rgba(94, 234, 212, 0.35), transparent 70%),
+    radial-gradient(55% 55% at 85% 16%, rgba(196, 181, 253, 0.5), transparent 72%),
+    radial-gradient(70% 55% at 55% 100%, rgba(147, 197, 253, 0.6), transparent 75%),
+    linear-gradient(165deg, #e8f1ff 0%, #f2ebff 55%, #e1f8f3 100%);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --blur: 30px;
+  --saturation: 165%;
+  --glass-opacity: 0.62;
+  --glass-rgb: 255, 255, 255;
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --glass-specular: rgba(255, 255, 255, 0.95);
+  --glass-highlight: rgba(255, 255, 255, 0.4);
+
+  --text: #111827;
+  --text-soft: rgba(17, 24, 39, 0.8);
+  --muted: rgba(17, 24, 39, 0.6);
+  --faint: rgba(17, 24, 39, 0.4);
+  --row: rgba(15, 23, 42, 0.055);
+  --row-hover: rgba(15, 23, 42, 0.09);
+  --row-active: rgba(15, 23, 42, 0.13);
+  --line: rgba(15, 23, 42, 0.12);
+  --line-soft: rgba(15, 23, 42, 0.07);
+
+  --accent: #0a6cff;
+  --accent-strong: #0050cc;
+  --accent-soft: rgba(10, 108, 255, 0.12);
+  --violet: #6d4aff;
+  --ok: #0f9d58;
+  --ok-soft: rgba(15, 157, 88, 0.12);
+  --warn: #b26a00;
+  --warn-soft: rgba(178, 106, 0, 0.12);
+  --bad: #cf2e24;
+  --bad-soft: rgba(207, 46, 36, 0.12);
+
+  --shadow-window: 0 40px 110px rgba(37, 55, 90, 0.28), 0 8px 24px rgba(37, 55, 90, 0.16);
+  --shadow-dock: 0 24px 60px rgba(37, 55, 90, 0.24);
+  --shadow-pop: 0 26px 70px rgba(37, 55, 90, 0.28);
+
+  --wallpaper: var(--wallpaper-soft);
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-scale: 0;
+  }
+}
+
+/* Wallpaper presets */
+:root[data-wallpaper='dawn'] {
+  --wallpaper:
+    radial-gradient(65% 55% at 18% 12%, rgba(251, 146, 60, 0.38), transparent 68%),
+    radial-gradient(55% 58% at 86% 14%, rgba(244, 114, 182, 0.34), transparent 70%),
+    radial-gradient(75% 60% at 52% 104%, rgba(129, 140, 248, 0.38), transparent 72%),
+    linear-gradient(165deg, #160b16 0%, #2a1028 52%, #102033 100%);
+}
+
+:root[data-wallpaper='ocean'] {
+  --wallpaper:
+    radial-gradient(68% 60% at 16% 8%, rgba(45, 212, 191, 0.34), transparent 68%),
+    radial-gradient(60% 60% at 88% 18%, rgba(56, 189, 248, 0.34), transparent 70%),
+    radial-gradient(76% 62% at 52% 104%, rgba(14, 116, 144, 0.55), transparent 72%),
+    linear-gradient(165deg, #041018 0%, #062a35 54%, #041f2c 100%);
+}
+
+:root[data-wallpaper='graphite'] {
+  --wallpaper:
+    radial-gradient(60% 55% at 16% 10%, rgba(148, 163, 184, 0.18), transparent 70%),
+    radial-gradient(55% 55% at 88% 18%, rgba(100, 116, 139, 0.22), transparent 72%),
+    radial-gradient(70% 60% at 55% 104%, rgba(51, 65, 85, 0.4), transparent 74%),
+    linear-gradient(165deg, #0c1017 0%, #151b25 55%, #101821 100%);
+}
+
+:root[data-theme='light'][data-wallpaper='dawn'] {
+  --wallpaper:
+    radial-gradient(65% 55% at 18% 12%, rgba(253, 186, 116, 0.55), transparent 68%),
+    radial-gradient(55% 58% at 86% 14%, rgba(249, 168, 212, 0.55), transparent 70%),
+    radial-gradient(75% 60% at 52% 104%, rgba(199, 210, 254, 0.7), transparent 72%),
+    linear-gradient(165deg, #fff3e8 0%, #ffe9f1 55%, #eef2ff 100%);
+}
+
+:root[data-theme='light'][data-wallpaper='ocean'] {
+  --wallpaper:
+    radial-gradient(65% 55% at 18% 12%, rgba(94, 234, 212, 0.5), transparent 68%),
+    radial-gradient(55% 58% at 86% 14%, rgba(125, 211, 252, 0.55), transparent 70%),
+    radial-gradient(75% 60% at 52% 104%, rgba(186, 230, 253, 0.75), transparent 72%),
+    linear-gradient(165deg, #e7fbff 0%, #eaf8ff 55%, #e9fff8 100%);
+}
+
+:root[data-theme='light'][data-wallpaper='graphite'] {
+  --wallpaper:
+    radial-gradient(60% 55% at 18% 10%, rgba(203, 213, 225, 0.7), transparent 70%),
+    radial-gradient(55% 55% at 86% 16%, rgba(226, 232, 240, 0.8), transparent 72%),
+    radial-gradient(70% 60% at 55% 104%, rgba(203, 213, 225, 0.7), transparent 74%),
+    linear-gradient(165deg, #f5f7fa 0%, #eef2f7 55%, #e8edf4 100%);
+}
+
+.wallpaper-custom {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.wallpaper-custom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(3, 6, 14, 0.16), rgba(3, 6, 14, 0.28));
+}
+
+:root[data-theme='light'] .wallpaper-custom::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.2));
+}

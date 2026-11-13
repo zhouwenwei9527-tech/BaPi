@@ -1,0 +1,109 @@
+name: aurora
+
+# Aurora local middleware. Qdrant is the production default; this machine's
+# registry mirror only exposes pgvector, so compose ships the documented
+# pgvector fallback (PRD §3.1). The VectorStorePort keeps the adapter swappable.
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aurora-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: aurora_root_pw
+      MYSQL_DATABASE: aurora
+      MYSQL_USER: aurora_app
+      MYSQL_PASSWORD: aurora_app_pw
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --log-bin-trust-function-creators=1
+    ports:
+      - "3308:3306"
+    volumes:
+      - aurora_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-paurora_root_pw"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  pgvector:
+    image: pgvector/pgvector:pg15
+    container_name: aurora-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aurora_vector
+      POSTGRES_USER: aurora
+      POSTGRES_PASSWORD: aurora_vector_pw
+      TZ: Asia/Shanghai
+    ports:
+      - "5433:5432"
+    volumes:
+      - aurora_pgvector:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurora -d aurora_vector"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: aurora-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: aurora_minio
+      MINIO_ROOT_PASSWORD: aurora_minio_pw
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - aurora_minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # ---- 一键体验全栈（docker compose --profile app up -d --build）----
+  backend:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    container_name: aurora-backend
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      AURORA_DB_URL: jdbc:mysql://mysql:3306/aurora?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+      AURORA_DB_USER: aurora_app
+      AURORA_DB_PASSWORD: aurora_app_pw
+      AURORA_PG_URL: jdbc:postgresql://pgvector:5432/aurora_vector
+      AURORA_MINIO_ENDPOINT: http://minio:9000
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      pgvector:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  frontend:
+    profiles: ["app"]
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    container_name: aurora-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  aurora_mysql:
+  aurora_pgvector:
+  aurora_minio:

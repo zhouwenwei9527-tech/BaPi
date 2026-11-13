@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BaPi · Aurora 桌面 POC</title>
+<style>
+:root,:root[data-theme=dark]{box-sizing:border-box;--blur:26px;--sat:180%;--op:.52;--rgb:26,29,42;--tx:#f4f6fb;--tx2:rgba(244,246,251,.62);--bd:rgba(255,255,255,.16);--spec:rgba(255,255,255,.3);--row:rgba(255,255,255,.07);--acc:#4da3ff;--ok:#3ddc84;--warn:#ffb340;--bad:#ff6b61;
+--wp:radial-gradient(60% 55% at 18% 12%,#14b8a655,transparent 70%),radial-gradient(55% 60% at 88% 18%,#8b5cf666,transparent 70%),radial-gradient(70% 55% at 55% 100%,#2563eb88,transparent 70%),linear-gradient(165deg,#070d1a,#0e1a36 55%,#08202c)}
+:root[data-theme=light]{--rgb:255,255,255;--op:.6;--tx:#161a24;--tx2:rgba(22,26,36,.6);--bd:rgba(255,255,255,.75);--spec:rgba(255,255,255,.95);--row:rgba(0,0,0,.05);--acc:#0a6cff;--ok:#12994a;--warn:#c27400;--bad:#d92d20;
+--wp:radial-gradient(60% 55% at 18% 12%,#5eead466,transparent 70%),radial-gradient(55% 60% at 88% 18%,#c4b5fd88,transparent 70%),radial-gradient(70% 55% at 55% 100%,#93c5fdaa,transparent 70%),linear-gradient(165deg,#e7f0ff,#f1e9ff 55%,#e0f7f4)}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box;margin:0}
+body{height:100%;overflow:hidden;font:13px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;color:var(--tx);background:var(--wp);-webkit-font-smoothing:antialiased;user-select:none}
+.rb{position:fixed;width:80vw;height:26vh;filter:blur(70px);opacity:.38;background:linear-gradient(90deg,#34d399,#60a5fa,#a78bfa);border-radius:50%;pointer-events:none;animation:dr 26s ease-in-out infinite alternate}
+@keyframes dr{to{transform:translate(8vw,6vh) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){.rb{animation:none}}
+.g{background:rgba(var(--rgb),var(--op));backdrop-filter:blur(var(--blur)) saturate(var(--sat));-webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--spec)}
+#mb{position:fixed;top:0;left:0;right:0;height:calc(30px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 14px 0;display:flex;align-items:center;gap:16px;z-index:9000;border-width:0 0 1px;font-size:12.5px}
+#mb .lg{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,#34d399,#6366f1);display:grid;place-items:center;font:700 9px sans-serif;color:#fff}
+#mb span{opacity:.85;cursor:default}#mb b{font-weight:600}.sp{flex:1}
+.mi{cursor:pointer;padding:2px 8px;border-radius:6px}.mi:hover{background:var(--row)}
+#rm{position:fixed;top:calc(32px + env(safe-area-inset-top,0px));right:10px;width:210px;border-radius:12px;padding:6px;z-index:9500;display:none}
+#rm div{padding:7px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between}#rm div:hover{background:var(--acc);color:#fff}#rm small{opacity:.65}
+#wg{position:fixed;left:18px;top:calc(46px + env(safe-area-inset-top,0px));width:250px;border-radius:18px;padding:14px 16px;z-index:5}
+#wg h4{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:2px}#wg .id{font-size:15px;font-weight:600;margin-bottom:10px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.kp div{background:var(--row);border-radius:10px;padding:8px 4px;text-align:center}.kp b{display:block;font-size:20px;font-weight:600}.kp small{font-size:11px;color:var(--tx2)}
+#dsk{position:fixed;right:18px;top:calc(44px + env(safe-area-inset-top,0px));bottom:110px;display:flex;flex-direction:column;flex-wrap:wrap-reverse;align-content:flex-start;gap:14px 10px;z-index:4}
+.di{width:78px;text-align:center;cursor:pointer;font-size:11.5px;text-shadow:0 1px 6px rgba(0,0,0,.45);color:#fff}
+.di .ic,.dk{display:grid;place-items:center;border-radius:22%;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 16px rgba(0,0,0,.3)}
+.di .ic{width:54px;height:54px;margin:0 auto 4px;font-size:27px}.di:active .ic{transform:scale(.94)}
+#dock{position:fixed;bottom:calc(8px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:8px;padding:8px 10px;border-radius:26px;z-index:9000;max-width:96vw}
+.dk{width:52px;height:52px;font-size:26px;position:relative;cursor:pointer;flex:none;color:#fff;transition:width .08s,height .08s}
+.dk.on::after{content:"";position:absolute;bottom:-6px;width:4px;height:4px;border-radius:50%;background:var(--tx)}
+.dk::before{content:attr(data-n);position:absolute;bottom:calc(100% + 10px);white-space:nowrap;padding:3px 9px;border-radius:7px;font-size:12px;background:rgba(20,22,30,.85);color:#fff;opacity:0;pointer-events:none;transition:opacity .12s}.dk:hover::before{opacity:1}
+.bg{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font:600 11px/18px sans-serif;text-align:center;padding:0 4px}
+.sep{width:1px;align-self:stretch;margin:4px 2px;background:var(--bd)}
+.w{position:absolute;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:rgba(var(--rgb),calc(var(--op) + .25));backdrop-filter:blur(var(--blur)) saturate(var(--sat));-webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));border:1px solid var(--bd);box-shadow:inset 0 1px 0 var(--spec),0 24px 60px rgba(0,0,0,.38);opacity:.94}
+.w.f{opacity:1;box-shadow:inset 0 1px 0 var(--spec),0 30px 80px rgba(0,0,0,.5)}
+.w.mx{left:8px!important;top:calc(36px + env(safe-area-inset-top,0px))!important;width:calc(100vw - 16px)!important;height:calc(100vh - 112px)!important}
+.tb{height:38px;flex:none;display:flex;align-items:center;gap:8px;padding:0 13px;cursor:grab;border-bottom:1px solid var(--bd)}
+.l{width:12px;height:12px;border-radius:50%;display:block}.tt{flex:1;text-align:center;font-weight:600;font-size:13px;margin-right:52px}
+.bd{flex:1;overflow:auto;user-select:text}
+.cp{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:600;background:var(--row)}
+.cp.ok{color:var(--ok)}.cp.warn{color:var(--warn)}.cp.bad{color:var(--bad)}.cp.info{color:var(--acc)}.cp.cur{background:var(--acc);color:#fff}
+.btn{border:0;border-radius:8px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer;background:var(--row);color:var(--tx)}.btn.p{background:var(--acc);color:#fff}.btn.d{background:var(--bad);color:#fff}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pad{padding:14px 16px}.mut{color:var(--tx2)}
+.card{background:var(--row);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.kv{display:grid;grid-template-columns:84px 1fr;gap:3px 10px;margin:8px 0 10px;font-size:12px}.kv span{color:var(--tx2)}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-weight:600;color:var(--tx2);font-size:11.5px;padding:7px 12px}td{padding:8px 12px;border-top:1px solid var(--bd)}
+.fn{display:flex;height:100%}.sb{width:150px;flex:none;padding:10px 8px;border-right:1px solid var(--bd);background:var(--row)}
+.sb div{padding:6px 10px;border-radius:8px;cursor:pointer}.sb div.on{background:var(--acc);color:#fff}.sb h5{font-size:11px;color:var(--tx2);padding:4px 10px}
+.fl{flex:1;overflow:auto}.fr{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--bd)}.fr .s{flex:1;min-width:0}.fr small{display:block;color:var(--tx2)}
+.ag{display:flex;flex-direction:column;height:100%}.ch{flex:1;overflow:auto;padding:14px 16px}
+.bu{max-width:88%;padding:8px 13px;border-radius:16px;margin-bottom:10px}.bu.u{background:var(--acc);color:#fff;margin-left:auto;border-bottom-right-radius:5px}.bu.a{background:var(--row);border-bottom-left-radius:5px}
+.st{display:flex;gap:8px;align-items:flex-start;font-size:12px;padding:2px 0}.d{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none}.d.ok{background:var(--ok)}.d.warn{background:var(--warn)}.d.bad{background:var(--bad)}
+.chips{padding:10px 14px 14px;display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--bd)}.chips .btn{font-weight:500}
+.sl{display:grid;grid-template-columns:90px 1fr 48px;align-items:center;gap:10px;margin-bottom:12px}input[type=range]{accent-color:var(--acc)}
+#pal{position:fixed;inset:0;z-index:9800;display:none;justify-content:center;align-items:flex-start;padding-top:14vh;background:rgba(0,0,0,.25)}
+.pb{width:min(640px,94vw);border-radius:18px;overflow:hidden;background:rgba(var(--rgb),calc(var(--op) + .3))}
+#pq{width:100%;border:0;outline:0;background:none;color:var(--tx);font:inherit;font-size:19px;padding:18px 20px;border-bottom:1px solid var(--bd);user-select:text}
+.pr{display:flex;align-items:center;gap:12px;padding:9px 20px;cursor:pointer}.pr.on{background:var(--acc);color:#fff}.pr.on small,.pr.on .mut{color:rgba(255,255,255,.8)}.pr .s{flex:1;min-width:0}.pr small{display:block;color:var(--tx2)}
+.pf{padding:8px 20px;font-size:11.5px;color:var(--tx2);border-top:1px solid var(--bd)}
+#toast{position:fixed;top:calc(40px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:9900;display:flex;flex-direction:column;gap:8px;align-items:center}
+#toast div{padding:9px 16px;border-radius:12px;font-weight:500;max-width:92vw}
+@media(max-width:700px){#wg,#dsk{display:none}.sb{width:110px}}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style></head><body>
+<div class="rb" style="left:-10vw;top:12vh"></div><div class="rb" style="right:-20vw;bottom:10vh;opacity:.28"></div>
+<div id="mb" class="g"><div class="lg">Ba</div><b id="an">BaPi</b><span>文件</span><span>编辑</span><span>视图</span><span>窗口</span><div class="sp"></div>
+<span class="mi" data-act="pal" title="Command Palette（⌘K）">🔍</span><span class="mi" data-act="fs" title="全屏">⛶</span><span class="mi" id="rl" data-act="rm"></span><span id="ck"></span></div>
+<div id="rm" class="g"></div><div id="wg" class="g"></div><div id="dsk"></div><div id="wins"></div><div id="dock" class="g"></div><div id="pal"></div><div id="toast"></div>
+<script>
+const $=(s,e=document)=>e.querySelector(s),$$=(s,e=document)=>[...e.querySelectorAll(s)];
+const cp=(t,c='')=>`<span class="cp ${c}">${t}</span>`,now=()=>new Date().toTimeString().slice(0,8);
+const ROLES={admin:{n:'林深',t:'系统管理员',p:['*']},ops:{n:'陈曦',t:'运营',p:['file:read','user:read','user:update','agent:use','approval:read','knowledge:public','knowledge:internal','glass:use']},guest:{n:'访客',t:'只读访客',p:['file:read','knowledge:public','glass:use']}};
+const ALLP=['file:read','file:finance','user:read','user:update','user:delete','agent:use','approval:read','approval:decide','audit:read','tool:read','plugin:manage','rbac:read','knowledge:public','knowledge:internal','knowledge:hr','glass:use'];
+let role='admin';const can=p=>!p||ROLES[role].p.includes('*')||ROLES[role].p.includes(p);
+const VC={EXECUTED:'ok',AUTO:'ok',PENDING:'warn',DENIED:'bad',TOOL_NOT_REGISTERED:'bad',REJECTED:'bad',ACTIVE:'ok',PENDING_AUTH:'warn',DISABLED:''};
+let baseTools=[['user.search','按条件查询用户','READ','AUTO','user:read'],['user.assignRole','调整用户角色','WRITE','ASK','user:update'],['user.delete','删除用户','DESTRUCTIVE','ASK','user:delete'],['file.share','对外共享文件','WRITE','ASK','file:read']].map(a=>({n:a[0],d:a[1],se:a[2],ap:a[3],p:a[4],src:'core'}));
+let plugins=[{n:'文献检索 Tool 包',v:'1.2.0',st:'ACTIVE',tool:{n:'paper.search',d:'检索文献摘要',se:'READ',ap:'AUTO',p:'knowledge:public',src:'plugin'}},{n:'实验数据导入 Tool 包',v:'0.9.1',st:'PENDING_AUTH',tool:{n:'dataset.import',d:'导入实验数据集',se:'WRITE',ap:'ASK',p:'file:read',src:'plugin'}}];
+const allTools=()=>[...baseTools,...plugins.filter(p=>p.st==='ACTIVE').map(p=>p.tool)];
+let approvals=[{id:'A-1023',tool:'file.share',by:'陈曦',se:'WRITE',args:'file=实验设计.docx, to=external',obj:'实验设计.docx',n:1,rb:'可回滚',st:'PENDING'}];
+let audit=[{id:'T-0998',tm:'09:41:07',on:'陈曦',tool:'user.search',args:'range=本月',verdict:'AUTO',steps:[['ok','Tool 已注册：user.search'],['ok','RBAC 通过：user:read'],['ok','READ · AUTO，直接执行，耗时 182ms']]}],aSel=0;
+const DATA=[
+{k:'ACTION',t:'打开审批队列',s:'需要 approval:read',p:'approval:read',a:'approvals'},{k:'ACTION',t:'让 Agent 删除用户',s:'DESTRUCTIVE · 需要 user:delete',p:'user:delete',a:'agent',r:2},{k:'ACTION',t:'回放审计轨迹',s:'需要 audit:read',p:'audit:read',a:'audit'},{k:'ACTION',t:'管理插件',s:'需要 plugin:manage',p:'plugin:manage',a:'plugins'},
+{k:'ENTITY',t:'张三',s:'用户 · 研发部',p:'user:read',ref:'user#1024'},{k:'ENTITY',t:'李四',s:'用户 · 财务部',p:'user:read',ref:'user#1031'},{k:'ENTITY',t:'审批 A-1023 · 对外共享文件',s:'审批单 · 待处理',p:'approval:read',ref:'approval#A-1023'},{k:'ENTITY',t:'实验设计.docx',s:'文件 · 2.4 MB',p:'file:read',ref:'file#88'},{k:'ENTITY',t:'财务月报_10月.xlsx',s:'文件 · 仅财务可见',p:'file:finance',ref:'file#91'},
+{k:'KNOWLEDGE',t:'数据范围在 Tool 层如何传递',s:'《Aurora 权限手册》第 3 页',p:'knowledge:public',ref:'doc#12'},{k:'KNOWLEDGE',t:'写操作为什么默认挂起审批',s:'《审批策略白皮书》第 7 段',p:'knowledge:internal',ref:'doc#15'},{k:'KNOWLEDGE',t:'岗位薪酬分级办法',s:'《薪酬制度》第 2 页',p:'knowledge:hr',ref:'doc#20'}];
+const APPS={
+finder:{n:'访达',i:'🗂️',c:['#5ab6ff','#2a6df4'],p:'file:read',w:[720,440],v:vFinder},
+agent:{n:'Agent 助手',i:'✦',c:['#b79cff','#6a5cf0'],p:'agent:use',w:[520,540],keep:1,v:vAgent},
+approvals:{n:'审批队列',i:'✓',c:['#4be3a0','#13a56b'],p:'approval:read',w:[600,500],v:vAppr},
+audit:{n:'审计回放',i:'⏱',c:['#ffb86b','#f0602f'],p:'audit:read',w:[700,420],v:vAudit},
+tools:{n:'Tool 注册表',i:'🧰',c:['#7dd3fc','#0e7490'],p:'tool:read',w:[700,380],v:vTools},
+plugins:{n:'插件',i:'🧩',c:['#f9a8d4','#be3d8f'],p:'plugin:manage',w:[600,440],v:vPlug},
+rbac:{n:'权限中心',i:'🛡',c:['#a3e635','#4d7c0f'],p:'rbac:read',w:[620,440],v:vRbac},
+glass:{n:'外观与玻璃',i:'◐',c:['#cbd5e1','#64748b'],p:'glass:use',w:[420,330],v:vGlass}};
+function vFinder(){const cats=['全部','实体','知识'],vis=DATA.filter(d=>d.k!=='ACTION'),ok=vis.filter(d=>can(d.p)),f=window.fc||0,l=ok.filter(d=>!f||(f==1?d.k==='ENTITY':d.k==='KNOWLEDGE'));
+return`<div class="fn"><div class="sb"><h5>位置</h5>${cats.map((c,i)=>`<div class="${i==f?'on':''}" data-act="fc" data-i="${i}">${c}</div>`).join('')}</div><div class="fl">${l.map(d=>`<div class="fr"><span style="font-size:20px">${d.k==='ENTITY'?'📄':'📖'}</span><div class="s"><b>${d.t}</b><small>${d.s}</small></div>${cp(d.p,'info')}</div>`).join('')}<div class="pad mut" style="font-size:11.5px">服务端已前置裁剪 ${vis.length-ok.length} 个无权限对象，不是前端隐藏。</div></div></div>`}
+function vAgent(){const u=ROLES[role];return`<div class="ag"><div class="ch" id="ch"><div class="bu a">我以 <b>${u.n}（${u.t}）</b>的身份工作，权限不会超过你。所有操作都经过 ToolCallingManager：先校验权限，写操作再挂起审批。<br><span class="mut">试试下面的指令。</span></div></div><div class="chips">${['查询本月新增用户','把李四加入运营组','删除用户 张三','直接调用 /internal/db/reset'].map((q,i)=>`<button class="btn" data-act="run" data-i="${i}">${q}</button>`).join('')}</div></div>`}
+function vAppr(){const dec=can('approval:decide');return`<div class="pad">${approvals.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>${a.id} · ${a.tool}</b>${cp(a.st,VC[a.st])}</div><div class="kv"><span>发起人</span><i>${a.by}（Agent 代表）</i><span>参数摘要</span><i>${a.args}</i><span>影响对象</span><i>${a.obj} · 预计 ${a.n} 条</i><span>副作用</span><i>${cp(a.se,a.se==='WRITE'?'warn':'bad')} ${a.rb}</i></div>${a.st==='PENDING'?`<button class="btn p" data-act="ap" data-id="${a.id}" data-v="1" ${dec?'':'disabled'}>批准并执行</button> <button class="btn" data-act="ap" data-id="${a.id}" data-v="0" ${dec?'':'disabled'}>拒绝</button>${dec?'':' <span class="mut">缺少 approval:decide</span>'}`:''}</div>`).join('')||'<div class="mut">没有待处理的审批。让 Agent 执行一次写操作试试。</div>'}</div>`}
+function vAudit(){const a=audit[aSel]||audit[0];return`<div style="display:flex;height:100%"><div style="width:58%;overflow:auto"><table><tr><th>时间</th><th>代表</th><th>Tool</th><th>结果</th></tr>${audit.map((x,i)=>`<tr data-act="as" data-i="${i}" style="cursor:pointer;${i==aSel?'background:var(--row)':''}"><td>${x.tm}</td><td>${x.on}</td><td>${x.tool}</td><td>${cp(x.verdict,VC[x.verdict])}</td></tr>`).join('')}</table></div><div class="pad" style="flex:1;border-left:1px solid var(--bd)"><b>轨迹 ${a.id}</b><div class="mut" style="margin:2px 0 10px">Agent 代表 ${a.on} · ${a.args}</div>${a.steps.map(s=>`<div class="st"><i class="d ${s[0]}"></i>${s[1]}</div>`).join('')}</div></div>`}
+function vTools(){return`<table><tr><th>名称</th><th>说明</th><th>副作用</th><th>审批</th><th>权限码</th><th>来源</th></tr>${allTools().map(t=>`<tr><td><b>${t.n}</b></td><td>${t.d}</td><td>${cp(t.se,t.se==='READ'?'ok':t.se==='WRITE'?'warn':'bad')}</td><td>${t.ap}</td><td>${t.p}</td><td>${t.src}</td></tr>`).join('')}</table>`}
+function vPlug(){const S=['INSTALLED','PENDING_AUTH','ACTIVE','DISABLED'],B={PENDING_AUTH:['授权启用','p'],ACTIVE:['停用',''],DISABLED:['启用','p']};
+return`<div class="pad">${plugins.map((p,i)=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${p.n} <span class="mut">${p.v}</span></b><span>${S.map(s=>cp(s,s===p.st?'cur':'')).join(' ')}</span></div><div class="mut" style="margin:6px 0 10px">注册 Tool：${p.tool.n} · 需要 ${p.tool.p}${p.st==='ACTIVE'?'':' · 当前不可执行'}</div><button class="btn ${B[p.st][1]}" data-act="pl" data-i="${i}">${B[p.st][0]}</button>${p.st==='DISABLED'?` <button class="btn d" data-act="pu" data-i="${i}">卸载</button>`:''}</div>`).join('')}<button class="btn" data-act="bad">安装示例：声明了未知权限的插件</button></div>`}
+function vRbac(){const ps=['admin','ops','guest'];return`<table><tr><th>资源码</th>${ps.map(r=>`<th>${ROLES[r].t}</th>`).join('')}</tr>${ALLP.map(c=>`<tr><td>${c}</td>${ps.map(r=>`<td>${r==='admin'||ROLES[r].p.includes(c)?'<span style="color:var(--ok)">●</span>':'<span class="mut">○</span>'}</td>`).join('')}</tr>`).join('')}</table>`}
+function vGlass(){const t=[['blur','模糊',0,60,'--blur','px',26],['sat','饱和度',100,260,'--sat','%',180],['op','不透明度',20,90,'--op','',52]];return`<div class="pad">${t.map(x=>`<div class="sl"><span>${x[1]}</span><input type="range" min="${x[2]}" max="${x[3]}" value="${window['g_'+x[0]]??x[6]}" data-tok="${x[0]}"><span class="mut" id="gv_${x[0]}">${window['g_'+x[0]]??x[6]}</span></div>`).join('')}<div style="display:flex;gap:8px;margin-top:6px"><button class="btn" data-act="th" data-v="dark">深色</button><button class="btn" data-act="th" data-v="light">浅色</button></div><p class="mut" style="margin-top:14px">基础档玻璃：blur + saturate + 半透明 + 内阴影高光，所有数值都是 token。</p></div>`}
+let z=10,W={},cur;
+function go(id){if(!can(APPS[id].p))return toast('无权限：缺少 '+APPS[id].p,'bad');open(id)}
+function open(id){let w=W[id];if(!w){const a=APPS[id],e=document.createElement('div'),n=Object.keys(W).length,ww=Math.min(a.w[0],innerWidth-16);e.className='w';e.style.cssText=`width:${ww}px;height:${Math.min(a.w[1],innerHeight-140)}px;left:${Math.max(8,Math.min(innerWidth-ww-8,290+n*32))}px;top:${52+n*30}px`;
+e.innerHTML=`<div class="tb"><i class="l" style="background:#ff5f57" data-w="x" data-id="${id}"></i><i class="l" style="background:#febc2e" data-w="m" data-id="${id}"></i><i class="l" style="background:#28c840" data-w="z" data-id="${id}"></i><span class="tt">${a.n}</span></div><div class="bd"></div>`;$('#wins').append(e);w=W[id]={e,id};e.onpointerdown=()=>focus(id);drag(w);draw(id)}
+w.e.style.display='flex';w.min=0;focus(id);dockR()}
+function draw(id){if(W[id])$('.bd',W[id].e).innerHTML=APPS[id].v()}
+function focus(id){W[id].e.style.zIndex=++z;cur=id;$('#an').textContent=APPS[id].n;$$('.w').forEach(e=>e.classList.toggle('f',e===W[id].e))}
+function drag(w){const t=$('.tb',w.e);t.onpointerdown=e=>{if(e.target.dataset.w||w.e.classList.contains('mx'))return;const r=w.e.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;t.setPointerCapture(e.pointerId);t.onpointermove=m=>{w.e.style.left=m.clientX-dx+'px';w.e.style.top=Math.max(32,m.clientY-dy)+'px'};t.onpointerup=()=>t.onpointermove=null}}
+function refresh(all){Object.keys(W).forEach(k=>{if(all||!APPS[k].keep)draw(k)});wgR();dockR()}
+function dockR(){const pend=approvals.filter(a=>a.st==='PENDING').length;$('#dock').innerHTML=Object.keys(APPS).filter(k=>can(APPS[k].p)).map(k=>`<div class="dk${W[k]?' on':''}" data-act="go" data-k="${k}" data-n="${APPS[k].n}" style="background:linear-gradient(145deg,${APPS[k].c[0]},${APPS[k].c[1]})">${APPS[k].i}${k==='approvals'&&pend?`<b class="bg">${pend}</b>`:''}</div>`).join('')+'<i class="sep"></i><div class="dk" data-act="pal" data-n="Command Palette（⌘K）" style="background:linear-gradient(145deg,#94a3b8,#334155)">⌕</div>'}
+function dskR(){$('#dsk').innerHTML=Object.keys(APPS).filter(k=>can(APPS[k].p)&&k!=='glass').map(k=>`<div class="di" data-act="go" data-k="${k}"><div class="ic" style="background:linear-gradient(145deg,${APPS[k].c[0]},${APPS[k].c[1]})">${APPS[k].i}</div>${APPS[k].n}</div>`).join('')}
+function wgR(){const u=ROLES[role];$('#wg').innerHTML=`<h4>控制面 · 执行面</h4><div class="id">${u.n} · ${u.t}</div><div class="kp"><div><b>${approvals.filter(a=>a.st==='PENDING').length}</b><small>待审批</small></div><div><b>${allTools().length}</b><small>已注册 Tool</small></div><div><b>${audit.length}</b><small>审计事件</small></div></div>`;$('#rl').textContent='👤 '+u.n}
+function toast(t,c){const d=document.createElement('div');d.className='g';d.style.color=c==='bad'?'var(--bad)':c==='ok'?'var(--ok)':'var(--tx)';d.textContent=t;$('#toast').append(d);setTimeout(()=>d.remove(),3200)}
+function log(tool,args,verdict,steps,on){audit.unshift({id:'T-'+(1000+audit.length),tm:now(),on:on||ROLES[role].n,tool,args,verdict,steps});aSel=0}
+const SC=[['user.search','range=本月','找到 12 位新增用户，其中运营组 5 人。'],['user.assignRole','user=李四, role=运营'],['user.delete','user=张三'],['internal.db.reset','']];
+function run(i){const s=SC[i],u=ROLES[role],t=allTools().find(x=>x.n===s[0]),ch=$('#ch');if(!ch)return;let st=[],v,res,id='A-'+(1024+approvals.length);
+if(!t){st=[['bad','Tool 注册表中没有 '+s[0]],['bad','TOOL_NOT_REGISTERED，请求未触达 Controller']];v='TOOL_NOT_REGISTERED';res='这个接口没有注册为 Tool，Agent 不能调用。'}
+else if(!can(t.p)){st=[['ok','Tool 已注册：'+t.n],['bad','RBAC 拒绝：'+u.n+' 没有 '+t.p],['ok','未生成审批任务']];v='DENIED';res='你没有这项权限，我也不会有。操作已拒绝。'}
+else if(t.se==='READ'&&t.ap==='AUTO'){st=[['ok','Tool 已注册：'+t.n],['ok','RBAC 通过：'+t.p],['ok','READ · AUTO，直接执行']];v='AUTO';res=s[2]}
+else{st=[['ok','Tool 已注册：'+t.n],['ok','RBAC 通过：'+t.p],['warn',t.se+' · ASK，已挂起为审批 '+id+(t.se==='DESTRUCTIVE'?'（需二次确认）':'')],['ok','数据尚未变更']];v='PENDING';res='已提交审批，批准后才会执行。';approvals.unshift({id,tool:t.n,by:u.n,se:t.se,args:s[1],obj:s[1].split(',')[0].split('=')[1],n:1,rb:t.se==='DESTRUCTIVE'?'不可回滚':'可回滚',st:'PENDING'})}
+log(s[0],s[1]||'—',v,st);ch.insertAdjacentHTML('beforeend',`<div class="bu u">${['查询本月新增用户','把李四加入运营组','删除用户 张三','直接调用 /internal/db/reset'][i]}</div>`);
+const b=document.createElement('div');b.className='bu a';ch.append(b);st.forEach((x,k)=>setTimeout(()=>{b.insertAdjacentHTML('beforeend',`<div class="st"><i class="d ${x[0]}"></i>${x[1]}</div>`);ch.scrollTop=1e5},k*380));
+setTimeout(()=>{b.insertAdjacentHTML('beforeend',`<div style="margin-top:6px">${cp(v,VC[v])} ${res}</div>`);ch.scrollTop=1e5;refresh()},st.length*380)}
+function setRole(r){role=r;Object.keys(W).forEach(k=>{if(!can(APPS[k].p)){W[k].e.remove();delete W[k]}});dskR();refresh(1);$('#rm').style.display='none';toast('已切换为 '+ROLES[r].n+'：无权限的入口自动隐藏')}
+function applyTok(k,v){const m={blur:['--blur',v+'px'],sat:['--sat',v+'%'],op:['--op',v/100]};document.documentElement.style.setProperty(m[k][0],m[k][1]);window['g_'+k]=v;const e=$('#gv_'+k);if(e)e.textContent=v}
+let pi=0,pr=[];
+function pal(o){const p=$('#pal');if(o===false){p.style.display='none';return}p.style.display='flex';p.innerHTML='<div class="pb g"><input id="pq" placeholder="搜索操作、实体、知识…" autocomplete="off"><div id="pl"></div><div class="pf" id="pf"></div></div>';$('#pq').focus();$('#pq').oninput=ps;ps()}
+function ps(){const q=$('#pq').value.trim().toLowerCase(),all=DATA.filter(d=>!q||(d.t+d.s).toLowerCase().includes(q));pr=all.filter(d=>can(d.p)).slice(0,8);pi=0;pd(all.length-all.filter(d=>can(d.p)).length)}
+function pd(h){const L={ACTION:['操作','info'],ENTITY:['实体','warn'],KNOWLEDGE:['知识','ok']};$('#pl').innerHTML=pr.map((d,i)=>`<div class="pr${i==pi?' on':''}" data-act="pk" data-i="${i}"><div class="s"><b>${d.t}</b><small>${d.s}${d.ref?' · '+d.ref:''}</small></div>${cp(L[d.k][0],L[d.k][1])}</div>`).join('')||'<div class="pad mut">没有可访问的结果</div>';$('#pf').textContent='权限过滤在检索阶段完成 · 已裁剪 '+h+' 条无权限结果'}
+function pk(i){const d=pr[i];if(!d)return;pal(false);go(d.a||'finder');if(d.r!==undefined)setTimeout(()=>run(d.r),250)}
+addEventListener('click',e=>{const w=e.target.closest('[data-w]');if(w){const id=w.dataset.id,x=W[id];if(w.dataset.w==='x'){x.e.remove();delete W[id];dockR()}else if(w.dataset.w==='m'){x.e.style.display='none';x.min=1}else x.e.classList.toggle('mx');return}
+if(!e.target.closest('#rm,[data-act=rm]'))$('#rm').style.display='none';const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,i=+t.dataset.i;
+({go:()=>go(t.dataset.k),pal:()=>pal(),fs:()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.(),
+rm:()=>{const m=$('#rm');m.innerHTML=Object.keys(ROLES).map(r=>`<div data-act="sr" data-r="${r}"><span>${ROLES[r].n}</span><small>${ROLES[r].t}</small></div>`).join('');m.style.display='block'},
+sr:()=>setRole(t.dataset.r),fc:()=>{window.fc=i;draw('finder')},run:()=>run(i),as:()=>{aSel=i;draw('audit')},pk:()=>pk(i),th:()=>document.documentElement.dataset.theme=t.dataset.v,
+ap:()=>{const x=approvals.find(y=>y.id===t.dataset.id),y=t.dataset.v==='1';x.st=y?'EXECUTED':'REJECTED';log(x.tool,x.args,x.st,[['ok','审批人 '+ROLES[role].n+(y?' 批准 ':' 拒绝 ')+x.id],[y?'ok':'bad',y?'工具已执行，补偿记录已写入':'未执行，数据未变更']],x.by);refresh();toast(y?x.id+' 已执行':x.id+' 已拒绝',y?'ok':'bad')},
+pl:()=>{const p=plugins[i];p.st=p.st==='ACTIVE'?'DISABLED':'ACTIVE';refresh();toast(p.st==='ACTIVE'?p.tool.n+' 已注册到 Tool Registry':p.tool.n+' 已停用','ok')},
+pu:()=>{const p=plugins.splice(i,1)[0];refresh();toast('已卸载，'+p.tool.n+' 从注册表移除，调用将返回 TOOL_NOT_REGISTERED','ok')},
+bad:()=>{log('plugin.install','lab:magic','DENIED',[['bad','注册被拒绝：权限码 lab:magic 不存在于 RBAC']]);refresh();toast('注册被拒绝：权限码 lab:magic 不存在于 RBAC','bad')}})[a]?.()});
+addEventListener('input',e=>{if(e.target.dataset.tok)applyTok(e.target.dataset.tok,+e.target.value)});
+addEventListener('keydown',e=>{const o=$('#pal').style.display==='flex';if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();pal(!o)}else if(o){if(e.key==='Escape')pal(false);else if(e.key==='ArrowDown'){pi=Math.min(pi+1,pr.length-1);pd(0);ps2()}else if(e.key==='ArrowUp'){pi=Math.max(pi-1,0);pd(0);ps2()}else if(e.key==='Enter')pk(pi)}});
+function ps2(){const q=$('#pq').value.trim().toLowerCase(),all=DATA.filter(d=>!q||(d.t+d.s).toLowerCase().includes(q));$('#pf').textContent='权限过滤在检索阶段完成 · 已裁剪 '+(all.length-all.filter(d=>can(d.p)).length)+' 条无权限结果'}
+$('#pal').addEventListener('click',e=>{if(e.target.id==='pal')pal(false)});
+$('#dock').addEventListener('mousemove',e=>$$('.dk',$('#dock')).forEach(d=>{const r=d.getBoundingClientRect(),f=Math.max(0,1-Math.abs(e.clientX-r.left-r.width/2)/110),s=52+30*f*f;d.style.width=d.style.height=s+'px';d.style.fontSize=s/2+'px'}));
+$('#dock').addEventListener('mouseleave',()=>$$('.dk',$('#dock')).forEach(d=>{d.style.width=d.style.height=d.style.fontSize=''}));
+document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+setInterval(()=>$('#ck').textContent=new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'}),1000);
+dskR();refresh();open('agent');setTimeout(()=>{open('approvals');focus('agent')},300);
+</script></body></html>
