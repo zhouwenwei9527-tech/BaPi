@@ -130,6 +130,40 @@ docs/                  PRD、API、ADR、系统截图
 scripts/               dev / stop / smoke / test / backup / restore
 ```
 
+## 接入真实大模型
+
+仓库默认内置**确定性本地模型**（规则式 `RuleBasedModelPort`）与**确定性本地 Embedding**，
+保证演示与测试可复现、且**不需要任何 API Key**。替换点有两个，都只要提供一个 Spring
+`@Primary` Bean，Gateway / 检索 / 审批 / 审计链路无需改动：
+
+```java
+// 1) 对话模型：实现 io.aurora.agent.model.ModelPort
+@Component
+@Primary
+public class MyLlm implements ModelPort {
+    private final WebClient http = WebClient.create("https://api.example.com/v1/chat");
+
+    @Override public String provider() { return "my-llm"; }
+
+    @Override
+    public ModelTurn complete(ModelRequest request) {
+        // 把 request.tools() 作为 function-calling 工具表下发；
+        // 只让模型"提议" ToolCall —— 真正执行永远在 ToolInvocationGateway。
+        ...
+    }
+}
+
+// 2) 向量模型：实现 io.aurora.retrieval.EmbeddingPort（文本 + 图片）
+```
+
+安全约定：
+
+- API Key 只放**环境变量或密钥管理器**（如 `AURORA_LLM_API_KEY`），启动时校验存在；
+  **任何 Key 都不要提交进仓库**——当前仓库里没有任何密钥，只有演示账号的公开默认密码。
+- 模型只产出"意图"（文本或 ToolCall 提议），越权 / 未注册 / 低可操作度 / 预算超限
+  仍会被 Gateway 拦截，`AdversarialModelTest` 用恶意模型验证了这一点。
+- 只读工具可直接自动执行；写操作会按同一套风险确认 / 双人复核策略走。
+
 ## 已知边界
 
 - 模型为确定性本地实现，`ModelPort` / `EmbeddingPort` 是接入真实 LLM 的替换点。
